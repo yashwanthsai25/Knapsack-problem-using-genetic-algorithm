@@ -1,160 +1,90 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Oct 26 12:55:49 2020
-
-@author: Chaithanya
-"""
 import random
-import sys
-import operator
 
-class Knapsack(object):	
+wt = [15,3,2,5,9,20]
+pt = [15,7,10,5,8,17]
+par = ["100110","001110","010100","011001"]
+score = [0,0,0,0]
+weight= [0,0,0,0]
+print("Parents:")
+print(par)
 
-	#initialize variables and lists
-	def __init__(self):	
+def fitScore(chrom):
+    x = 0
+    y = 0
+    for i in range(0,6):
+        if chrom[i] is "1":
+            x+= wt[i]
+            y+= pt[i]
+    return x, y
+"""
+while 1:
+    x = input(">>")
+    print("weight,point")
+    print(fitScore(str(x)))
+"""
 
-		self.C = 0
-		self.weights = []
-		self.profits = []
-		self.opt = []
-		self.parents = []
-		self.newparents = []
-		self.bests = []
-		self.best_p = [] 
-		self.iterated = 1
-		self.population = 0
 
-		# increase max recursion for long stack
-		iMaxStackSize = 15000
-		sys.setrecursionlimit(iMaxStackSize)
 
-	# create the initial population 
-	def initialize(self):
+def minAndBetter(scr):
+    d = score[0]
+    temp = 0
+    flag = 0
+    for i in range(0,4):
+        print(score[i])
+        if score[i]<d and score[i]<scr:
+            d = score[i]
+            temp = i
+            flag = 1
+    if flag==1:
+        print("replaced a",temp,d)
+        return temp
+    else:
+        t = random.randint(0,3)
+        print("replaced b", t)
+        return t
 
-		for i in range(self.population):
-			parent = []
-			for k in range(0, 5):
-				k = random.randint(0, 1)
-				parent.append(k)
-			self.parents.append(parent)
 
-	# set the details of this problem
-	def properties(self, weights, profits, opt, C, population):
+i=1
+while (i<4):
+    print("Generation#",i)
+    # fitness score all
+    for j in range(0,4):
+        weight[j],score[j] = fitScore(par[j])
+        print(par[j],weight[j],score[j])
 
-		self.weights = weights
-		self.profits = profits
-		self.opt = opt
-		self.C = C
-		self.population = population
-		self.initialize()
+    # Selection
+    t1 = random.randint(0,3) # these are candidates
+    t2 = random.randint(0,3)
+    while(t1==t2):
+        t1 = random.randint(1, 3)
 
-	# calculate the fitness function of each list (sack)
-	def fitness(self, item):
+    p1 = par[t1]
+    p2= par[t2]
+    print("Candidate parents",p1,p2)
 
-		sum_w = 0
-		sum_p = 0
+    #Crossover
+    c1 = p1[0:3]+p2[3:]
+    print("After Crossover:",c1)
+    #Mutation
+    child = [0,0,0,0,0,0]
+    t2 = random.randint(0, 5)
+    for j in range(0,6):
+        child[j] = c1[j]
 
-		# get weights and profits
-		for index, i in enumerate(item):
-			if i == 0:
-				continue
-			else:
-				sum_w += self.weights[index]
-				sum_p += self.profits[index]
+    if child[t2] == '1':
+        child[t2] = '0'
+    else:
+        child[t2] = '1'
 
-		# if greater than the optimal return -1 or the number otherwise
-		if sum_w > self.C:
-			return -1
-		else: 
-			return sum_p
-	
-	# run generations of GA
-	def evaluation(self):
+    c1 = ''.join(child)
+    print("After Mutation:", c1)
+    #Validation
+    chWt1, chPt1 = fitScore(c1)
+    if chWt1 <= 30:
+        x = minAndBetter(chPt1)
+        par[x] = c1
 
-		# loop through parents and calculate fitness
-		best_pop = self.population // 2
-		for i in range(len(self.parents)):
-			parent = self.parents[i]
-			ft = self.fitness(parent)
-			self.bests.append((ft, parent))
+    print(">>>>>",c1,"Weight",chWt1,"Point",chPt1)
 
-		# sort the fitness list by fitness		
-		self.bests.sort(key=operator.itemgetter(0), reverse=True)
-		self.best_p = self.bests[:best_pop]
-		self.best_p = [x[1] for x in self.best_p]
-
-	# mutate children after certain condition
-	def mutation(self, ch):
-
-		for i in range(len(ch)):		
-			k = random.uniform(0, 1)
-			if k > 0.5:
-				#if random float number greater that 0.5 flip 0 with 1 and vice versa
-				if ch[i] == 1:
-					ch[i] = 0
-				else: 
-					ch[i] = 1
-		return ch
-
-	# crossover two parents to produce two children by miixing them under random ration each time
-	def crossover(self, ch1, ch2):
-
-		threshold = random.randint(1, len(ch1)-1)
-		tmp1 = ch1[threshold:]
-		tmp2 = ch2[threshold:]
-		ch1 = ch1[:threshold]
-		ch2 = ch2[:threshold]
-		ch1.extend(tmp2)
-		ch2.extend(tmp1)
-
-		return ch1, ch2
-
-	# run the GA algorithm
-	def run(self):
-
-		# run the evaluation once
-		self.evaluation()
-		newparents = []
-		pop = len(self.best_p)-1
-
-		# create a list with unique random integers
-		sample = random.sample(range(pop), pop)
-		for i in range(0, pop):
-			# select the random index of best children to randomize the process
-			if i < pop-1:
-				r1 = self.best_p[i]
-				r2 = self.best_p[i+1]
-				nchild1, nchild2 = self.crossover(r1, r2)
-				newparents.append(nchild1)
-				newparents.append(nchild2)
-			else:
-				r1 = self.best_p[i]
-				r2 = self.best_p[0]
-				nchild1, nchild2 = self.crossover(r1, r2)
-				newparents.append(nchild1)
-				newparents.append(nchild2)
-
-		# mutate the new children and potential parents to ensure global optima found
-		for i in range(len(newparents)):
-			newparents[i] = self.mutation(newparents[i])
-
-		if self.opt in newparents:
-			print ("optimal found in {} generations" .format(self.iterated))
-		else:
-			self.iterated += 1
-			print("recreate generations for {} time" .format(self.iterated))
-			self.parents = newparents
-			self.bests = []
-			self.best_p = []
-			self.run()	
-
-# properties for this particular problem
-weights = [12,  7, 11, 8, 9]
-profits = [24, 13, 23, 15, 16]
-opt     = [0, 1, 1, 1, 0]
-C = 26
-population = 10
-
-k = Knapsack()
-k.properties(weights, profits, opt, C, population)
-k.run()
+    # termination after 15 generation
+    i+=1

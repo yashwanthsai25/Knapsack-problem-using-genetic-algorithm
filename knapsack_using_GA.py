@@ -86,5 +86,4 @@ while (i<4):
 
     print(">>>>>",c1,"Weight",chWt1,"Point",chPt1)
 
-    # termination after 15 generation
     i+=1

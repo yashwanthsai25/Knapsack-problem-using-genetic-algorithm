@@ -1,3 +1,11 @@
+# ITEM            WEIGHT     PROFIT
+# SLEEPING BAG    15         15
+# ROPE            3          7
+# POCKET KNIFE    2          10
+# TORCH           5          5
+# BOTTLE          9          8
+# GLUCOSE         20         17
+
 import random
 
 wt = [15,3,2,5,9,20]

@@ -95,3 +95,51 @@ while (i<4):
     print(">>>>>",c1,"Weight",chWt1,"Point",chPt1)
 
     i+=1
+
+"""
+Parents:
+['100110', '001110', '010100', '011001']
+Generation# 1
+100110 29 28
+001110 16 23
+010100 8 12
+011001 25 34
+Candidate parents 010100 100110
+After Crossover: 010110
+After Mutation: 011110
+28
+23
+12
+34
+replaced  010100
+>>>>> 011110 Weight 19 Profit 30
+after replacing: 
+['100110', '001110', '011110', '011001']
+Generation# 2
+100110 29 28
+001110 16 23
+011110 19 30
+011001 25 34
+Candidate parents 011110 100110
+After Crossover: 011110
+After Mutation: 111110
+not updated because weight is  34
+Generation# 3
+100110 29 28
+001110 16 23
+011110 19 30
+011001 25 34
+Candidate parents 001110 011110
+After Crossover: 001110
+After Mutation: 011110
+28
+23
+30
+34
+replaced  001110
+>>>>> 011110 Weight 19 Profit 30
+after replacing: 
+['100110', '011110', '011110', '011001']
+optimal sol:  ['100110', '011110', '011110', '011001']
+
+"""
